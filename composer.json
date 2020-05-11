@@ -1,0 +1,30 @@
+{
+    "name": "aikrof/hydrator-module",
+    "type": "module",
+    "homepage": "https://github.com/Aikrof",
+    "authors": [
+        {
+            "name": "Denys",
+            "email": "AikrofStark@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+    	"php": ">=7.2.0",
+	"phpunit/phpunit": "^8.5"
+    },
+    "autoload": {
+    	"psr-4": {
+	    "Aikrof\\Hydrator\\": "src/"
+	}
+    },
+    "autoload-dev": {
+    	"psr-4": {
+	    "Aikrof\\Hydrator\\Tests\\": "tests/"
+	}
+    },
+    "config": {
+        "secure-http": false
+    }
+}

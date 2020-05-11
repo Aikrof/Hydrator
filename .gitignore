@@ -1,0 +1,14 @@
+# phpStorm project files
+/.idea
+
+# composer vendor dir
+/vendor
+
+# CodeSniffer configuration
+/phpcs.xml
+
+# composer itself
+composer.phar
+
+# Mac DS_Store Files
+.DS_Store
