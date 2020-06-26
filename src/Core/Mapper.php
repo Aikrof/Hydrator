@@ -249,7 +249,7 @@ class Mapper
             return true;
         }
 
-        $valueType = \gettype($value);
+        $valueType = TypeEnum::getValueType($value);
 
         if ($valueType === TypeEnum::TYPE_ARRAY &&
             \in_array($this->type, TypeEnum::ARRAY_TYPES, true)
@@ -274,7 +274,7 @@ class Mapper
             }
 
             foreach ($value as $valueField) {
-                if (\gettype($valueField) !== $nestedType) {
+                if (TypeEnum::getValueType($valueField) !== $nestedType) {
                     return false;
                 }
             }

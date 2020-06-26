@@ -17,34 +17,24 @@ use Aikrof\Hydrator\Hydrator;
  */
 trait HydratorTrait
 {
-    public function extractData(EntityInterface $entity = null): array
+    /**
+     * Extract data from object to array
+     *
+     * @param array $exclude define list of fields that should be excluded.
+     * @param bool  $hideNullProperties If set `$hideNullProperties` = true, null properties will be mapped to array only if:
+     *        1. In field annotation we set null like compound property (string|null).
+     *        2. We haven't any annotation for field.
+     *        3. In field annotation we have `@internal` tag.
+     *
+     * @return array
+     */
+    public function extractData(array $exclude = [], bool $hideNullProperties = false): array
     {
-        if (!$entity && !$this instanceof EntityInterface){
-            throw new \InvalidArgumentException('Entity not found.');
-        }
-
-        return Hydrator::extract($entity ?: $this);
+        return Hydrator::extract($this, $exclude, $hideNullProperties);
     }
 
-    public function hydrateData(array $data, $entity = null): object
+    public function hydrateData(array $data): void
     {
-        if (!$entity && $this instanceof EntityInterface){
-            Hydrator::hydrate($data, $this);
-
-            return $this;
-        }
-
-        return Hydrator::hydrate($data, (string)$entity);
-
-//        return Hydrator::getHydrator()->hydrate($data, $entity ?: $this);
-//        if (!$entity && $this instanceof EntityInterface){
-//            ServiceHydrator::getHydrator()->hydrateFromObject($data, $this);
-//        }
-//        else if (\is_string($entity) || \in_array(EntityInterface::class, \class_implements((string)$entity), true)){
-//            ServiceHydrator::getHydrator()->hydrate($data, (string)$entity);
-//        }
-//        else if (\is_object($entity) && $entity instanceof EntityInterface){
-//            ServiceHydrator::getHydrator()->hydrateFromObject($data, $entity);
-//        }
+        Hydrator::hydrate($this, $data);
     }
 }

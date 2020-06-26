@@ -36,11 +36,11 @@ final class ServiceHydrator implements ServiceHydratorInterface
 
     /**
      * @param object $entity Object entity.
+     * @param array  $exclude define list of fields that should be excluded.
      * @param bool   $hideNullProperties If set `$hideNullProperties` = false null properties will be mapped to array only if:
      *      1. If in field annotation we set null like compound property (string|null).
      *      2. If we haven't any annotation for field.
      *      3. If in field annotation we have `@internal` tag.
-     * @param array  $exclude define list of fields that should be excluded.
      * @param bool   $recursiveCall
      *
      * @return array
@@ -48,8 +48,8 @@ final class ServiceHydrator implements ServiceHydratorInterface
      */
     public function extractFromEntity(
         object $entity,
-        bool $hideNullProperties,
         array $exclude,
+        bool $hideNullProperties,
         bool $recursiveCall = false
     ): array {
         $class = \get_class($entity);
@@ -83,13 +83,13 @@ final class ServiceHydrator implements ServiceHydratorInterface
                     if ($mapping->getType() === TypeEnum::ARRAY_OF_OBJECT) {
                         $nestedProperties = [];
                         foreach ($property as $key => $nestedObject) {
-                            $nestedProperties[$key] = $this->extractFromEntity($nestedObject, $hideNullProperties, $exclude, true);
+                            $nestedProperties[$key] = $this->extractFromEntity($nestedObject, $exclude, $hideNullProperties, true);
                         }
 
                         $value = $nestedProperties;
                     }
                     else {
-                        $value = $this->extractFromEntity($property, $hideNullProperties, $exclude, true);
+                        $value = $this->extractFromEntity($property, $exclude, $hideNullProperties, true);
                     }
                 }
                 else {
@@ -98,7 +98,7 @@ final class ServiceHydrator implements ServiceHydratorInterface
             }
 
             if (empty($value)) {
-                if ($hideNullProperties === true && empty($mapping->getDefaultValue()) && !$mapping->isNullDefault()) {
+                if ($hideNullProperties === true && empty($mapping->getDefaultValue())) {
                     continue;
                 }
 
@@ -108,12 +108,26 @@ final class ServiceHydrator implements ServiceHydratorInterface
             // Exclude nested fields
             if (!$recursiveCall && !empty($exclude) && \is_array($value)) {
                 $fieldLength = \strlen($field);
-                foreach ($exclude as $excludeKey => $ExcludeVal) {
+                foreach ($exclude as $excludeKey => $excludeVal) {
                     if (strncmp($excludeKey, $field, $fieldLength) === 0) {
                         $nested = \explode('.', $excludeKey);
                         unset($nested[0]);
 
-                        if ($this->excludeNestedFields($nested, $value) === true) {
+                        $isValueExcluded = false;
+                        // if we have nested arrays, we need to exclude fields from all of this arrays
+                        if (isset($value[0])) {
+                            foreach ($value as $dataKey => $dataValue) {
+                                $isValueExcluded = $this->excludeNestedFields($nested, $value[$dataKey]);
+                                if ($isValueExcluded === false) {
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            $isValueExcluded = $this->excludeNestedFields($nested, $value);
+                        }
+
+                        if ($isValueExcluded === true) {
                             unset($exclude[$excludeKey]);
                         }
                     }
@@ -129,29 +143,31 @@ final class ServiceHydrator implements ServiceHydratorInterface
     /**
      * Create entity and hydrate data from array to this entity.
      *
-     * @param array     $data
      * @param string    $class
+     * @param array     $data
      *
      * @return object
      */
-    public function createEntityAndHydrate(array $data, string $class): object
+    public function createEntityAndHydrate(string $class, array $data): object
     {
         $entity = Instance::create($class);
 
-        return $this->hydrateToEntity($data, $entity);
+        return $this->hydrateToEntity($entity, $data);
     }
 
     /**
      * Hydrate data from array to entity.
      *
-     * @param array     $data
      * @param object    $entity
+     * @param array     $data
      *
      * @return object
      */
-    public function hydrateToEntity(array $data, object $entity): object
+    public function hydrateToEntity(object $entity, array $data): object
     {
         $class = \get_class($entity);
+
+        $this->validateEntity($entity, $class);
 
         /** @var \Aikrof\Hydrator\Core\Mapper[] */
         $mappings = $this->reflection->getMappings($class);
@@ -165,14 +181,14 @@ final class ServiceHydrator implements ServiceHydratorInterface
                     $nestedProperties = [];
                     foreach ($fieldValue as $key => $nestedValue) {
                         $nestedProperties[$key] = $this->createEntityAndHydrate(
-                            $nestedValue ?: [], $mapping->getClassName()
+                            $mapping->getClassName(), $nestedValue ?: []
                         );
                     }
 
                     $value = $nestedProperties;
                 }
                 else {
-                    $value = $this->createEntityAndHydrate($fieldValue ?: [], $mapping->getClassName());
+                    $value = $this->createEntityAndHydrate($mapping->getClassName(), $fieldValue ?: []);
                 }
             }
             else {

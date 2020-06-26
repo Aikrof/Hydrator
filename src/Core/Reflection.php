@@ -85,6 +85,7 @@ class Reflection implements ReflectionInterface
 
         $mapper = new Mapper($class);
         $schemas = [];
+
         foreach ($properties as $property){
             /**  @var \Aikrof\Hydrator\Core\Annotation $annotation */
             $annotation = Annotation::getDoc($factory, $property);

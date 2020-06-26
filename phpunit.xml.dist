@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+<!--    <groups>-->
+<!--        <exclude></exclude>-->
+<!--    </groups>-->
+    <php>
+        <includePath>.</includePath>
+        <const name="USE_ROOT_VENDOR" value="false"/>
+    </php>
+</phpunit>

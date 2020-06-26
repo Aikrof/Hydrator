@@ -12,7 +12,7 @@ namespace Aikrof\Hydrator\Core;
 /**
  * Class TypeEnum
  */
-abstract class TypeEnum
+class TypeEnum
 {
     public const TYPE_STRING = 'string';
     public const TYPE_INT = 'int';
@@ -52,4 +52,31 @@ abstract class TypeEnum
         self::ARRAY_OF_INT,
         self::ARRAY_OF_FLOAT,
     ];
+
+    /**
+     * @param mixed $value
+     *
+     * @return string value type
+     */
+    public static function getValueType($value): ?string
+    {
+        $valueType = \gettype($value);
+
+        switch ($valueType) {
+            case "boolean":
+                return self::TYPE_BOOLEAN;
+            case "integer":
+                return self::TYPE_INT;
+            case "double":
+                return self::TYPE_FLOAT;
+            case "string":
+                return self::TYPE_STRING;
+            case "array":
+                return self::TYPE_ARRAY;
+            case "object":
+                return self::TYPE_OBJECT;
+            default:
+                return null;
+        }
+    }
 }

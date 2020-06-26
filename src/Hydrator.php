@@ -36,44 +36,48 @@ class Hydrator
     }
 
     /**
+     * Extract data from object to array.
+     *
      * @param object|string    $entity
+     * @param array            $exclude define list of fields that should be excluded.
      * @param bool             $hideNullProperties If set `$hideNullProperties` = true, null properties will be mapped to array only if:
      *        1. In field annotation we set null like compound property (string|null).
      *        2. We haven't any annotation for field.
      *        3. In field annotation we have `@internal` tag.
      *
-     * @param array            $exclude define list of fields that should be excluded.
      *
      * @return array
      */
-    public static function extract($entity, bool $hideNullProperties = false, array $exclude = []): array
+    public static function extract($entity, array $exclude = [], bool $hideNullProperties = false): array
     {
         if (\is_object($entity)){
-            return self::getServiceHydrator()->extractFromEntity($entity, $hideNullProperties, $exclude);
+            return self::getServiceHydrator()->extractFromEntity($entity, $exclude, $hideNullProperties);
         }
 
         if (\is_string($entity) || \in_array(EntityInterface::class, \class_implements((string)$entity), true)){
             $object = Instance::create((string)$entity);
-            return self::getServiceHydrator()->extractFromEntity($object, $hideNullProperties, $exclude);
+            return self::getServiceHydrator()->extractFromEntity($object, $exclude, $hideNullProperties);
         }
 
         return [];
     }
 
     /**
-     * @param array             $data
+     * Hydrate data from array to object.
+     *
      * @param object|string     $entity
+     * @param array             $data
      *
      * @return object
      */
-    public static function hydrate(array $data, $entity): object
+    public static function hydrate($entity, array $data): object
     {
         if (\is_object($entity)) {
-            return self::getServiceHydrator()->hydrateToEntity($data, $entity);
+            return self::getServiceHydrator()->hydrateToEntity($entity, $data);
         }
 
         if (\is_string($entity)) {
-            return self::getServiceHydrator()->createEntityAndHydrate($data, $entity);
+            return self::getServiceHydrator()->createEntityAndHydrate($entity, $data);
         }
     }
 }
