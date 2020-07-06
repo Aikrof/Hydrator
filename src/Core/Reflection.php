@@ -10,7 +10,6 @@ declare(strict_types = 1);
 namespace Aikrof\Hydrator\Core;
 
 use Aikrof\Hydrator\Exceptions\HydratorExeption;
-use Aikrof\Hydrator\Interfaces\ReflectionInterface;
 use Aikrof\Hydrator\Interfaces\CacheInterface;
 use Aikrof\Hydrator\Components\Instance;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -19,7 +18,7 @@ use ReflectionProperty;
 /**
  * Class Reflection
  */
-class Reflection implements ReflectionInterface
+class Reflection
 {
     protected const PUBLIC = ReflectionProperty::IS_PUBLIC;
     protected const PROTECTED = ReflectionProperty::IS_PROTECTED;
@@ -34,29 +33,36 @@ class Reflection implements ReflectionInterface
     private static $allow = self::PUBLIC | self::PROTECTED;
 
     /**
-     * @var CacheInterface|null
+     * @var \Aikrof\Hydrator\Interfaces\CacheInterface|null
      */
     private $cache;
 
+    /**
+     * Reflection constructor.
+     *
+     * @param \Aikrof\Hydrator\Interfaces\CacheInterface|null $cache
+     */
     public function __construct(CacheInterface $cache = null)
     {
-        $this->cache = $cache ?: Instance::createIfExist(CacheInterface::class);
+        $this->cache = $cache ?: Instance::create(CacheInterface::class);
     }
 
     /**
      * @param string $class
      *
      * @return array
+     *
      * @throws \ReflectionException
      */
     public function getMappings(string $class): array
     {
         if (empty(self::$mappings[$class])) {
             if ($this->isCached($class)) {
-                $this->setMappingsFromCache($class);
+                $this->getMappingsFromCache($class);
             }
             else {
                 $this->createMappings($class);
+                $this->setMappingsToCache($class);
             }
         }
 
@@ -66,6 +72,7 @@ class Reflection implements ReflectionInterface
     /**
      * @param string $class
      *
+     * @throws \Aikrof\Hydrator\Exceptions\HydratorExeption
      * @throws \ReflectionException
      */
     private function createMappings(string $class): void
@@ -107,17 +114,14 @@ class Reflection implements ReflectionInterface
                     $mapping->setClassName($annotation->getClassName());
                     $mapping->setIsObject(true);
 
-                    $this->createMappings($annotation->getClassName());
+                    $this->getMappings($annotation->getClassName());
                 }
             }
             else {
-                // If we haven't annotation of this field, we will set nullable for default property of this field
+                // If we haven't annotation for this field, we will set nullable for default property of this field
                 $mapping->setIsNullDefaul(true);
             }
 
-            /**
-             * @todo put $schema in to cache
-             */
             $mapping->setDefaultValue($values[$property->getName()]);
             $schemas[$property->name] = $mapping;
         }
@@ -126,7 +130,7 @@ class Reflection implements ReflectionInterface
     }
 
     /**
-     * @todo search schema in cache
+     * Search schema in cache
      *
      * @param string $class
      *
@@ -134,20 +138,39 @@ class Reflection implements ReflectionInterface
      */
     private function isCached(string $class): bool
     {
-        if ($this->cache) {
-            //TO DO
+        if (!empty($this->cache)) {
+            try {
+                return (bool)$this->cache->get($class);
+            } catch (\Exception $e) {
+                return false;
+            }
         }
 
         return false;
     }
 
     /**
-     * @todo get mappings from cache and set them in to self::$mappings[$class]
+     * Get mappings from cache.
      *
      * @param string $class
      */
-    private function setMappingsFromCache(string $class): void
+    private function getMappingsFromCache(string $class): void
     {
-        // TO DO
+        $schema = $this->cache->get($class);
+
+        self::$mappings[$class] = \unserialize($schema);
+    }
+
+    /**
+     * Set mappings to cache.
+     *
+     * @param string $class
+     */
+    private function setMappingsToCache(string $class): void
+    {
+        try {
+            $schema = \serialize(self::$mappings[$class]);
+            $this->cache->set($class, $schema);
+        } catch (\Exception $e) {}
     }
 }

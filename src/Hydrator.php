@@ -5,7 +5,7 @@
  * @author Denys <AikrofStark@gmail.com>
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Aikrof\Hydrator;
 
@@ -47,16 +47,18 @@ class Hydrator
      *
      *
      * @return array
+     *
+     * @throws \Aikrof\Hydrator\Exceptions\HydratorExeption
      */
     public static function extract($entity, array $exclude = [], bool $hideNullProperties = false): array
     {
         if (\is_object($entity)){
-            return self::getServiceHydrator()->extractFromEntity($entity, $exclude, $hideNullProperties);
+            return self::getServiceHydrator()->extract($entity, $exclude, $hideNullProperties);
         }
 
         if (\is_string($entity) || \in_array(EntityInterface::class, \class_implements((string)$entity), true)){
             $object = Instance::create((string)$entity);
-            return self::getServiceHydrator()->extractFromEntity($object, $exclude, $hideNullProperties);
+            return self::getServiceHydrator()->extract($object, $exclude, $hideNullProperties);
         }
 
         return [];
@@ -68,16 +70,13 @@ class Hydrator
      * @param object|string     $entity
      * @param array             $data
      *
-     * @return object
+     * @return object|null
+     *
+     * @throws \Aikrof\Hydrator\Exceptions\ClassNotFoundException
+     * @throws \Aikrof\Hydrator\Exceptions\HydratorExeption
      */
-    public static function hydrate($entity, array $data): object
+    public static function hydrate($entity, array $data): ?object
     {
-        if (\is_object($entity)) {
-            return self::getServiceHydrator()->hydrateToEntity($entity, $data);
-        }
-
-        if (\is_string($entity)) {
-            return self::getServiceHydrator()->createEntityAndHydrate($entity, $data);
-        }
+        return self::getServiceHydrator()->hydrate($entity, $data);
     }
 }

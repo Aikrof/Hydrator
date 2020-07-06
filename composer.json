@@ -12,7 +12,8 @@
     "prefer-stable": true,
     "require": {
     	"php": ">=7.2.0",
-        "phpdocumentor/reflection-docblock": "5.*"
+        "phpdocumentor/reflection-docblock": "5.*",
+        "ext-redis": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

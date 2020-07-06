@@ -14,5 +14,20 @@ namespace Aikrof\Hydrator\Interfaces;
  */
 interface CacheInterface
 {
+    /**
+     * Set data mappings to cache.
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function set(string $key, string $value): void;
 
+    /**
+     * Get data mappings from cache.
+     *
+     * @param string $key
+     *
+     * @return string|null
+     */
+    public function get(string $key): ?string;
 }

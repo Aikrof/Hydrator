@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace Aikrof\Hydrator\Tests\Hydrator;
 
+use Aikrof\Hydrator\Exceptions\ClassNotFoundException;
 use Aikrof\Hydrator\Exceptions\HydratorExeption;
 use Aikrof\Hydrator\Hydrator;
 use Aikrof\Hydrator\Tests\Fixtures\Entities\EmptyEntity;
@@ -118,9 +119,20 @@ class HydrateTest extends TestCase
     }
 
     /**
+     * Undefined class test
+     */
+    public function testClassNotFoundException(): void
+    {
+        $className = 'undefined';
+        $this->expectException(ClassNotFoundException::class);
+        $this->expectExceptionMessage('Class ' . $className . ' is not exist.');
+        Hydrator::hydrate($className, []);
+    }
+
+    /**
      * Empty object test
      */
-    public function testException(): void
+    public function testEmptyEntityException(): void
     {
         $this->expectException(HydratorExeption::class);
         $this->expectExceptionMessage('Cannot get properties from: `Aikrof\Hydrator\Tests\Fixtures\Entities\EmptyEntity`');

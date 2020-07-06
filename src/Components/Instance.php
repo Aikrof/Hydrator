@@ -5,7 +5,7 @@
  * @author Denys <AikrofStark@gmail.com>
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Aikrof\Hydrator\Components;
 
@@ -17,17 +17,15 @@ use Aikrof\Hydrator\Components\FileManager\NativeFileManager;
  *
  * @todo change logic of this class
  */
-class Instance implements InstanceInterface
+class Instance
 {
     private static $throwError = true;
 
-    /**
-     * {@inheritDoc}
-     */
-    public static function create(string $class): object
+
+    public static function create(string $class)
     {
         // TO DO (create normal `create instance`)
-        switch (self::getCurrentEnvironment()){
+        switch (self::getCurrentEnvironment()) {
             case 'yii':
                 return self::createFromYiiContainer($class);
             case 'laravel':
@@ -53,30 +51,24 @@ class Instance implements InstanceInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     private static function createFromYiiContainer(string $class): object
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     private static function createFromLaravelContainer(string $class): object
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    private static function createNativeObject(string $class): object
+
+    private static function createNativeObject(string $class)
     {
         $container = NativeFileManager::getNativeContainer();
 
-        if (empty($container[$class]) && \class_exists($class) === false){
+        if (empty($container[$class]) && !\class_exists($class)){
             throw new ClassNotFoundException($class);
         }
 
@@ -85,9 +77,6 @@ class Instance implements InstanceInterface
         return new $className;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getCurrentEnvironment(): string
     {
         $yiiEnvironment = \class_exists('\Yii');

@@ -29,7 +29,7 @@ class ClassNotFoundException extends BaseException
         $thisIsInterface = \interface_exists($className);
 
         if ($thisIsInterface) {
-            $message = 'Interface ' . $className . ' is not attached for anyone class.';
+            $message = 'Interface ' . $className . ' is not attached for any class.';
         }
         else {
             $message = 'Class ' . $className . ' is not exist.';
