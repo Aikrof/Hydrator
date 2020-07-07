@@ -18,7 +18,7 @@ use Aikrof\Hydrator\Hydrator;
 trait HydratorTrait
 {
     /**
-     * Extract data from object to array
+     * Extract data from this object to array
      *
      * @param array $exclude define list of fields that should be excluded.
      * @param bool  $hideNullProperties If set `$hideNullProperties` = true, null properties will be mapped to array only if:
@@ -33,6 +33,11 @@ trait HydratorTrait
         return Hydrator::extract($this, $exclude, $hideNullProperties);
     }
 
+    /**
+     * Hydrate data from array to this object
+     *
+     * @param array $data
+     */
     public function hydrateData(array $data): void
     {
         Hydrator::hydrate($this, $data);
