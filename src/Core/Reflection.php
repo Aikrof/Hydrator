@@ -44,7 +44,7 @@ class Reflection
      */
     public function __construct(CacheInterface $cache = null)
     {
-        $this->cache = $cache ?: Instance::create(CacheInterface::class);
+        $this->cache = $cache ?: Instance::createIfExist(CacheInterface::class);
     }
 
     /**
@@ -168,9 +168,12 @@ class Reflection
      */
     private function setMappingsToCache(string $class): void
     {
-        try {
-            $schema = \serialize(self::$mappings[$class]);
-            $this->cache->set($class, $schema);
-        } catch (\Exception $e) {}
+        if (!empty($this->cache)) {
+            try {
+                $schema = \serialize(self::$mappings[$class]);
+                $this->cache->set($class, $schema);
+            } catch (\Exception $e) {
+            }
+        }
     }
 }

@@ -10,6 +10,9 @@
 # composer itself
 composer.phar
 
+#composer lock file
+composer.lock
+
 # Mac DS_Store Files
 .DS_Store
 

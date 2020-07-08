@@ -39,7 +39,6 @@ final class ServiceHydrator implements ServiceHydratorInterface
     {
         $this->extractService = $extractService ?: Instance::create(ExtractService::class);
         $this->hydrateService = $hydrateService ?: Instance::create(HydrateService::class);
-        var_dump(1);
     }
 
     /**

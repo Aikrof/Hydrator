@@ -20,13 +20,13 @@
     },
     "autoload": {
     	"psr-4": {
-	    "Aikrof\\Hydrator\\": "src/"
-	}
+	        "Aikrof\\Hydrator\\": "src/"
+	    }
     },
     "autoload-dev": {
     	"psr-4": {
-	    "Aikrof\\Hydrator\\Tests\\": "tests/"
-	}
+	        "Aikrof\\Hydrator\\Tests\\": "tests/"
+	    }
     },
     "config": {
         "secure-http": false
