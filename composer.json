@@ -1,6 +1,6 @@
 {
     "name": "aikrof/hydrator-module",
-    "type": "module",
+    "type": "library",
     "homepage": "https://github.com/Aikrof",
     "authors": [
         {
@@ -12,8 +12,7 @@
     "prefer-stable": true,
     "require": {
     	"php": ">=7.2.0",
-        "phpdocumentor/reflection-docblock": "5.*",
-        "ext-redis": "*"
+        "phpdocumentor/reflection-docblock": "5.*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
