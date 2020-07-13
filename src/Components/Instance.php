@@ -11,6 +11,7 @@ namespace Aikrof\Hydrator\Components;
 
 use Aikrof\Hydrator\Exceptions\ClassNotFoundException;
 use Aikrof\Hydrator\Components\FileManager\NativeFileManager;
+use Aikrof\Hydrator\Interfaces\CacheInterface;
 
 /**
  * Class Instance
@@ -19,52 +20,7 @@ use Aikrof\Hydrator\Components\FileManager\NativeFileManager;
  */
 class Instance
 {
-    private static $throwError = true;
-
-
     public static function create(string $class)
-    {
-        // TO DO (create normal `create instance`)
-        switch (self::getCurrentEnvironment()) {
-            case 'yii':
-                return self::createFromYiiContainer($class);
-            case 'laravel':
-                return self::createFromLaravelContainer($class);
-            case 'native':
-                return self::createNativeObject($class);
-        }
-    }
-
-    public static function createIfExist(string $class): ?object
-    {
-        // TO DO (create normal container exist function)
-        switch (self::getCurrentEnvironment()){
-            case 'yii':
-                return null;
-            case 'laravel':
-                return null;
-            case 'native':
-                if (empty(NativeFileManager::getNativeContainer()[$class])){
-                    return null;
-                }
-                return self::createNativeObject($class);
-        }
-    }
-
-
-    private static function createFromYiiContainer(string $class): object
-    {
-
-    }
-
-
-    private static function createFromLaravelContainer(string $class): object
-    {
-
-    }
-
-
-    private static function createNativeObject(string $class)
     {
         $container = NativeFileManager::getNativeContainer();
 
@@ -77,15 +33,21 @@ class Instance
         return new $className;
     }
 
-    public static function getCurrentEnvironment(): string
+    public static function ensure(string $interface): ?object
     {
-        $yiiEnvironment = \class_exists('\Yii');
-        $laravelEnvironment = \class_exists('\App');
+        $object = null;
 
-        if ($yiiEnvironment || $laravelEnvironment) {
-            return $yiiEnvironment ? 'yii' : 'laravel';
+        if (\class_exists('\Yii') && isset(\Yii::$container)) {
+            $container = \Yii::$container;
+            if ($container->hasSingleton($interface) || \array_key_exists($interface, $container->getDefinitions())) {
+                $object = \Yii::createObject($interface);
+            }
         }
 
-        return 'native';
+        if (!empty($object) && $object instanceof $interface) {
+            return $object;
+        }
+
+        return null;
     }
 }

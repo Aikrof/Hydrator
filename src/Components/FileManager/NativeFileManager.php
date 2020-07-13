@@ -19,7 +19,7 @@ class NativeFileManager
     /**
      * Path to native config file.
      */
-    private const PATH_TO_NATIVE_CONFIG = __DIR__ . '/../../Config/Native/common.php';
+    public const PATH_TO_NATIVE_CONFIG = __DIR__ . '/../../Config/common.php';
 
     /**
      * Get Native config from config file.
@@ -45,12 +45,7 @@ class NativeFileManager
     public static function getNativeContainer(): ?array
     {
         $config = self::getNativeConfig();
-
-        return $config['container'];
-    }
-
-    public function setToNativeContainer(array $data): void
-    {
-        // To do
+        
+        return \array_key_exists('container', $config) ? $config['container'] : null;
     }
 }

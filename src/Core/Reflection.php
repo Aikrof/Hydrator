@@ -44,7 +44,7 @@ class Reflection
      */
     public function __construct(CacheInterface $cache = null)
     {
-        $this->cache = $cache ?: Instance::createIfExist(CacheInterface::class);
+        $this->cache = $cache ?: Instance::ensure(CacheInterface::class);
     }
 
     /**
