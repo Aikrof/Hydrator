@@ -19,7 +19,7 @@ use Aikrof\Hydrator\Interfaces\CacheInterface;
 class Instance
 {
     /**
-     * Create object from native container.
+     * Create object from container, if object is not exist create from native container.
      *
      * @param string $class
      *
@@ -27,6 +27,10 @@ class Instance
      */
     public static function create(string $class): object
     {
+        if (!empty($object = self::ensure($class))) {
+            return $object;
+        }
+
         $container = NativeFileManager::getNativeContainer();
 
         if (empty($container[$class]) && !\class_exists($class)){

@@ -20,9 +20,9 @@ use ReflectionProperty;
  */
 class Reflection
 {
-    protected const PUBLIC = ReflectionProperty::IS_PUBLIC;
-    protected const PROTECTED = ReflectionProperty::IS_PROTECTED;
-    protected const PRIVATE = ReflectionProperty::IS_PRIVATE;
+    public const PUBLIC = ReflectionProperty::IS_PUBLIC;
+    public const PROTECTED = ReflectionProperty::IS_PROTECTED;
+    public const PRIVATE = ReflectionProperty::IS_PRIVATE;
 
     /** @var self */
     private static $mappings;
@@ -30,7 +30,7 @@ class Reflection
     /**
      * @var int
      */
-    private static $allow = self::PUBLIC | self::PROTECTED;
+    public $access;
 
     /**
      * @var \Aikrof\Hydrator\Interfaces\CacheInterface|null
@@ -42,9 +42,10 @@ class Reflection
      *
      * @param \Aikrof\Hydrator\Interfaces\CacheInterface|null $cache
      */
-    public function __construct(CacheInterface $cache = null)
+    public function __construct(CacheInterface $cache = null, $config = [])
     {
         $this->cache = $cache ?: Instance::ensure(CacheInterface::class);
+        $this->access = $config['access'] ?? self::PUBLIC | self::PROTECTED;
     }
 
     /**
@@ -80,7 +81,7 @@ class Reflection
         $reflectionClass = new \ReflectionClass($class);
 
         /** @var ReflectionProperty $properties */
-        $properties = $reflectionClass->getProperties(self::$allow);
+        $properties = $reflectionClass->getProperties($this->access);
         $values = $reflectionClass->getDefaultProperties();
 
         if (empty($properties)) {
