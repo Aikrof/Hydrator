@@ -27,7 +27,7 @@ class RedisCache implements CacheInterface
     {
         $this->redis = $redis ?: Instance::create(Redis::class);
         try {
-            @$this->redis->connect('localhost', 6379);
+            @$this->redis->connect('redis', 6379);
         } catch (\Exception $e) {
         }
     }

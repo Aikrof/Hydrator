@@ -15,12 +15,17 @@ use Aikrof\Hydrator\Interfaces\CacheInterface;
 
 /**
  * Class Instance
- *
- * @todo change logic of this class
  */
 class Instance
 {
-    public static function create(string $class)
+    /**
+     * Create object from native container.
+     *
+     * @param string $class
+     *
+     * @return object
+     */
+    public static function create(string $class): object
     {
         $container = NativeFileManager::getNativeContainer();
 
@@ -33,14 +38,29 @@ class Instance
         return new $className;
     }
 
+    /**
+     * Create object from Yii or Laravel container.
+     *
+     * @param string $interface
+     *
+     * @return object|null
+     */
     public static function ensure(string $interface): ?object
     {
         $object = null;
 
         if (\class_exists('\Yii') && isset(\Yii::$container)) {
             $container = \Yii::$container;
+
             if ($container->hasSingleton($interface) || \array_key_exists($interface, $container->getDefinitions())) {
                 $object = \Yii::createObject($interface);
+            }
+        }
+        else if (\class_exists(\Illuminate\Container\Container::class)) {
+            $container = \Illuminate\Container\Container::getInstance();
+
+            if ($container->has($interface)) {
+               $object = $container->make($interface);
             }
         }
 
