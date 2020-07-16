@@ -1,11 +1,19 @@
 {
     "name": "aikrof/hydrator",
     "type": "library",
-    "homepage": "https://github.com/Aikrof",
+    "description": "Convert objects to arrays and back",
+    "keywords": [
+        "hydrator",
+        "mapper",
+        "extract data from object to array",
+        "hydrate data from array to object"
+    ],
+    "homepage": "https://github.com/Aikrof/Hydrator",
     "authors": [
         {
             "name": "Denys",
-            "email": "AikrofStark@gmail.com"
+            "email": "AikrofStark@gmail.com",
+            "homepage": "https://github.com/Aikrof"
         }
     ],
     "license": "MIT",
