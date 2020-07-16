@@ -8,6 +8,7 @@
             "email": "AikrofStark@gmail.com"
         }
     ],
+    "license": "MIT",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
