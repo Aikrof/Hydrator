@@ -18,6 +18,26 @@ use Aikrof\Hydrator\Exceptions\ClassNotFoundException;
 final class HydrateService extends Service
 {
     /**
+     * Create entity if string, and hydrate data from array to entity
+     *
+     * @param object|string     $entity
+     * @param array             $data
+     *
+     * @return object|null
+     */
+    public function hydrate($entity, array $data): ?object
+    {
+        if (\is_object($entity)) {
+            return $this->hydrateToEntity($entity, $data);
+        }
+        else if (\is_string($entity)) {
+            return $this->createEntityAndHydrate($entity, $data);
+        }
+
+        return null;
+    }
+
+    /**
      * Create entity and hydrate data from array to this entity.
      *
      * @param string    $class
@@ -29,7 +49,7 @@ final class HydrateService extends Service
      * @throws \Aikrof\Hydrator\Exceptions\ClassNotFoundException
      * @throws \Aikrof\Hydrator\Exceptions\HydratorExeption
      */
-    public function createEntityAndHydrate(string $class, array $data): object
+    private function createEntityAndHydrate(string $class, array $data): object
     {
         if (!\class_exists($class)) {
             throw new ClassNotFoundException($class);
@@ -51,7 +71,7 @@ final class HydrateService extends Service
      * @throws \ReflectionException
      * @throws \Aikrof\Hydrator\Exceptions\HydratorExeption
      */
-    public function hydrateToEntity(object $entity, array $data): object
+    private function hydrateToEntity(object $entity, array $data): object
     {
         $class = \get_class($entity);
 
@@ -62,21 +82,34 @@ final class HydrateService extends Service
 
         $entityData = [];
         foreach ($mappings as $field => $mapping) {
-            $fieldValue = $data[$field] ?? $mapping->getDefaultValue();
+            // check if entity has value or add default value from entity class.
+            $defaultValue = $this->getFieldFromObject($entity, $field) ?? $mapping->getDefaultValue();
+            $fieldValue = $data[$field] ?? $defaultValue;
 
             if ($mapping->isObject()) {
                 if ($mapping->getType() === TypeEnum::ARRAY_OF_OBJECT) {
                     $nestedProperties = [];
                     foreach ($fieldValue as $key => $nestedValue) {
-                        $nestedProperties[$key] = $this->createEntityAndHydrate(
-                            $mapping->getClassName(), $nestedValue ?: []
-                        );
+                        /**
+                         * !!!to tests
+                         */
+                        $nestedEntity = $this->getFieldFromObject($entity, $field);
+                        if ($nestedEntity === null || !\is_object($nestedEntity)) {
+                            $nestedEntity = $mapping->getClassName();
+                        }
+
+                        $nestedProperties[$key] = $this->hydrate($nestedEntity, $nestedValue ?: []);
                     }
 
                     $value = $nestedProperties;
                 }
                 else {
-                    $value = $this->createEntityAndHydrate($mapping->getClassName(), $fieldValue ?: []);
+                    $nestedEntity = $this->getFieldFromObject($entity, $field);
+                    if ($nestedEntity === null || !\is_object($nestedEntity)) {
+                        $nestedEntity = $mapping->getClassName();
+                    }
+
+                    $value = $this->hydrate($nestedEntity, $fieldValue ?: []);
                 }
             }
             else {

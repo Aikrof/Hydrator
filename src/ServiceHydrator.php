@@ -73,14 +73,6 @@ final class ServiceHydrator implements ServiceHydratorInterface
      */
     public function hydrate($entity, array $data): ?object
     {
-        if (\is_object($entity)) {
-            return $this->hydrateService->hydrateToEntity($entity, $data);
-        }
-
-        if (\is_string($entity)) {
-            return $this->hydrateService->createEntityAndHydrate($entity, $data);
-        }
-
-        return null;
+        return $this->hydrateService->hydrate($entity, $data);
     }
 }

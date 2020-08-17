@@ -47,7 +47,7 @@ abstract class Service
         $isObject = \is_object($entity);
 
         if (!$isObject) {
-            throw new HydratorExeption("Entity mast be an object {$entity}");
+            throw new HydratorExeption("Entity must be an object {$entity}.");
         }
 
         if ($isObject && empty($entity)) {
@@ -113,5 +113,18 @@ abstract class Service
                 $this->{$field} = $value;
             }
         })->call($entity, $data);
+    }
+
+    /**
+     * @param object $entity
+     * @param string $field
+     *
+     * @return mixed
+     */
+    protected function getFieldFromObject(object $entity, string $field)
+    {
+        return (function ($field) {
+            return isset($this->{$field}) ? $this->{$field} : null;
+        })->call($entity, $field);
     }
 }
